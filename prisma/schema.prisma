@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  password      String
-  name          String
-  accounts      Account[]
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
+  accounts     Account[]
   transactions Transaction[]
-  categories    Category[]
-  budgets       Budget[]
-  createdAt     DateTime       @default(now())
+  categories   Category[]
+  budgets      Budget[]
+  createdAt    DateTime      @default(now())
 }
 
 model Account {
@@ -35,6 +35,9 @@ model Category {
   userId       String
   user         User          @relation(fields: [userId], references: [id])
   transactions Transaction[]
+
+  // Garante que o mesmo usuário não tenha duas categorias com o mesmo nome
+  @@unique([name, userId])
 }
 
 model Transaction {
@@ -43,19 +46,22 @@ model Transaction {
   amount      Float
   type        String   // "INCOME" ou "EXPENSE"
   date        DateTime @default(now())
+  
   accountId   String
   account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
+  
   userId      String
   user        User     @relation(fields: [userId], references: [id])
 }
 
 model Budget {
-  id         String   @id @default(uuid())
-  amount     Float
-  month      Int
-  year       Int
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  id      String @id @default(uuid())
+  amount  Float
+  month   Int
+  year    Int
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
 }
