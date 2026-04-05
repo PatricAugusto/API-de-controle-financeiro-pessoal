@@ -1,15 +1,14 @@
-const express = require('express');
-const dotenv = require('dotenv');
+import express from 'express';
+import dotenv from 'dotenv';
+import userRoutes from './routes/userRoutes.js';
 
-// Carregar variáveis de ambiente
 dotenv.config();
 
 const app = express();
-
-// Middleware para processar JSON no corpo das requisições
 app.use(express.json());
 
-// Rota de teste
+app.use('/users', userRoutes);
+
 app.get('/health', (req, res) => {
   return res.json({ message: "FinTrack API está online!" });
 });

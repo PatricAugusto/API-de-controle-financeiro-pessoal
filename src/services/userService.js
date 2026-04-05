@@ -1,9 +1,9 @@
-const prisma = require('../config/database');
-const bcrypt = require('bcryptjs');
+import prisma from '../config/database.js'; 
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 class UserService {
   async createUser(data) {
-    // 1. Verificar se o e-mail já existe
     const userExists = await prisma.user.findUnique({
       where: { email: data.email }
     });
@@ -12,17 +12,15 @@ class UserService {
       throw new Error('Este e-mail já está em uso.');
     }
 
-    // 2. Criptografar a senha (salt de 10)
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // 3. Salvar no banco
     return await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
         password: hashedPassword,
       },
-      select: { // Não retornar a senha no JSON de resposta!
+      select: {
         id: true,
         name: true,
         email: true,
@@ -30,6 +28,32 @@ class UserService {
       }
     });
   }
+
+  async login(email, password) {
+    // 1. Buscar usuário pelo e-mail
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new Error('E-mail ou senha inválidos.');
+    }
+
+    // 2. Comparar a senha digitada com o hash do banco
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('E-mail ou senha inválidos.');
+    }
+
+    // 3. Gerar o Token JWT (expira em 1 dia)
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    return {
+      user: { id: user.id, name: user.name, email: user.email },
+      token
+    };
+  }
 }
 
-module.exports = new UserService();
+export default new UserService();
