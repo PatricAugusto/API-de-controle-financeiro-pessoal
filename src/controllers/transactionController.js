@@ -11,13 +11,20 @@ class TransactionController {
   }
 
   async index(req, res) {
-    try {
-      const transactions = await transactionService.listUserTransactions(req.userId);
-      return res.json(transactions);
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
+  try {
+    const { month, year } = req.query;
+    
+    // Passamos os filtros para o service
+    const transactions = await transactionService.listUserTransactions(req.userId, {
+      month: month ? parseInt(month) : null,
+      year: year ? parseInt(year) : null
+    });
+
+    return res.json(transactions);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
+}
 }
 
 export default new TransactionController();
