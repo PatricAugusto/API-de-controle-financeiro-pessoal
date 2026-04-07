@@ -4,6 +4,7 @@ import userRoutes from './routes/userRoutes.js';
 import accountRoutes from './routes/accountRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import { errorHandler } from './middlewares/errorMiddleware.js';
 
 dotenv.config();
 
@@ -20,6 +21,8 @@ app.get('/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
