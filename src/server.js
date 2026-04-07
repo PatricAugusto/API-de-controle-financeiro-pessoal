@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import accountRoutes from './routes/accountRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/accounts', accountRoutes);
 app.use('/transactions', transactionRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 app.get('/health', (req, res) => {
   return res.json({ message: "FinTrack API está online!" });
